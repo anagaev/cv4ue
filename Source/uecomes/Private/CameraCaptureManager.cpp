@@ -1,7 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CameraCaptureManager.h"
+#include "CoCoDataStruct/CoCoAnnotationInfo.h"
+#include "CoCoDataStruct/CoCoFrameInfo.h"
 
 //#include "Engine.h"
 #include "Runtime/Engine/Classes/Engine/Engine.h"
@@ -10,23 +9,17 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/GameplayStatics.h"
-#include "ShowFlags.h"
 #include "AsyncTasks/AsyncSaveImageToDiskTask.h"
 #include "AsyncTasks/AsyncSaveJsonToDiskTask.h"
+#include "ShowFlags.h"
 #include "Materials/Material.h"
-
 #include "RHICommandList.h"
-
 #include "ImageWrapper/Public/IImageWrapper.h"
 #include "ImageWrapper/Public/IImageWrapperModule.h"
-
 #include "ImageUtils.h"
-
 #include "Modules/ModuleManager.h"
 #include "Misc/FileHelper.h"
 #include "JsonObjectConverter.h"
-
-
 
 // Sets default values
 ACameraCaptureManager::ACameraCaptureManager()
@@ -51,7 +44,6 @@ void ACameraCaptureManager::BeginPlay()
 	} else{
 		UE_LOG(LogTemp, Error, TEXT("No CaptureComponent set!"));
 	}
-	
 }
 
 // Called every frame
@@ -60,7 +52,10 @@ void ACameraCaptureManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
     CaptureNonBlocking();
+    
 
+    // READ UINT8 IMAGE
+	// Read pixels once RenderFence is completed
     if(!RenderRequestQueue.IsEmpty()){
         // Peek the next RenderRequest from queue
         FRenderRequestStruct* nextRenderRequest = nullptr;
@@ -68,27 +63,20 @@ void ACameraCaptureManager::Tick(float DeltaTime)
 
         if(nextRenderRequest){ //nullptr check
             if(nextRenderRequest->RenderFence.IsFenceComplete()){ // Check if rendering is done, indicated by RenderFence
+                // Load the image wrapper module 
+                IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+
+                // Decide storing of data, either jpeg or png
                 FString fileName = "img_" + ToStringWithLeadingZeros(ImgCounter, NumDigits);
                 FString filePath = FPaths::ProjectSavedDir() + SubDirectoryName + "/" + fileName;
-                if (outputFormat == IMG) {
-                    // Load the image wrapper module 
-                    IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-
-                    // Decide storing of data, either jpeg or png
-                    TArray64<uint8> ImgData;
-
-                    filePath += ".png";
-                    ImageWrapperModule.CompressImage(ImgData, EImageFormat::JPEG, FImageView(nextRenderRequest->Image.GetData(), FrameWidth, FrameHeight), 100);
+                TArray64<uint8> ImgData;
+                switch (outputFormat){
+                case IMG:
+                    filePath += ".jpeg";
+                    ImageWrapperModule.CompressImage(ImgData, EImageFormat::JPEG, FImageView(nextRenderRequest->Image.GetData(), FrameWidth, FrameHeight));
                     RunAsyncImageSaveTask(ImgData, filePath);
-
-                    if(VerboseLogging && !fileName.IsEmpty()){
-                        UE_LOG(LogTemp, Warning, TEXT("%f"), *fileName);
-                    }
-
-                    // Delete the first element from RenderQueue
-                    RenderRequestQueue.Pop();
-                    delete nextRenderRequest;
-                } else {
+                    break;
+                case JSON:
                     filePath += ".json";
                     TArray<FColor>& rawData = nextRenderRequest->Image;
                     UCoCoImageInfo imageInfo(ImgCounter, FrameWidth, FrameHeight, fileName + ".jpeg");
@@ -113,8 +101,19 @@ void ACameraCaptureManager::Tick(float DeltaTime)
                         } else { ++length;}
                     }
                     RunAsyncJsonSaveTask(frameInfo.GetStructData(), filePath);
+                    break;
                 }
+
+                    
+                if(VerboseLogging && !fileName.IsEmpty()){
+                    UE_LOG(LogTemp, Warning, TEXT("%f"), *fileName);
+                }
+                
                 ImgCounter += 1;
+
+                // Delete the first element from RenderQueue
+                RenderRequestQueue.Pop();
+                delete nextRenderRequest;
             }
         }
     }
@@ -129,9 +128,11 @@ void ACameraCaptureManager::SetupCaptureComponent(){
     // Create RenderTargets
     UTextureRenderTarget2D* renderTarget2D = NewObject<UTextureRenderTarget2D>();
 
+
     renderTarget2D->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8; //8-bit color format
     renderTarget2D->InitCustomFormat(FrameWidth, FrameHeight, PF_B8G8R8A8, true); // PF... disables HDR, which is most important since HDR gives gigantic overhead, and is not needed!
     UE_LOG(LogTemp, Warning, TEXT("Set Render Format for Color-Like-Captures"));
+
     
     renderTarget2D->bGPUSharedFlag = true; // demand buffer on GPU
 
