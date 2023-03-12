@@ -1,0 +1,12 @@
+{
+	"images": [
+		{
+			"id": 1,
+			"width": 768,
+			"height": 512,
+			"file_name": "img_000001.jpeg",
+			"license": 84036672
+		}
+	],
+	"annotations": []
+}

@@ -89,10 +89,10 @@ void ACameraCaptureManager::Tick(float DeltaTime)
                         if (currentColor != rawData[i].R){
                             UCoCoAnnotationInfo* ptrObAnnotation = frameInfo.Find(currentColor);
                             if (ptrObAnnotation != nullptr){
-                                ptrObAnnotation->Update(initPos, length, FrameWidth, FrameHeight);
+                                ptrObAnnotation->Update(initPos, length);
                             } else {
-                                UCoCoAnnotationInfo newAnnotation(currentColor, ImgCounter);
-                                newAnnotation.Update(initPos, length, FrameWidth, FrameHeight);
+                                UCoCoAnnotationInfo newAnnotation(currentColor, ImgCounter, FrameWidth, FrameHeight);
+                                newAnnotation.Update(initPos, length);
                                 frameInfo.AddAnnotation(currentColor, newAnnotation);
                             }
                             initPos = i;

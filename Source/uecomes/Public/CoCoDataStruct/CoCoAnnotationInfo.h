@@ -33,10 +33,15 @@ struct FCoCoAnnotationInfo{
 
 class UECOMES_API UCoCoAnnotationInfo
 {
+private:
+	int width;
+	int height;
 public:
 	FCoCoAnnotationInfo data;
-	UCoCoAnnotationInfo(int id, int imageId);
+	UCoCoAnnotationInfo(int id, int imageId, int imgWidth, int imgHeight);
 	~UCoCoAnnotationInfo();
 	FCoCoAnnotationInfo GetStructData();
-	void Update(int initPos, int length, int w, int h);
+	void Update(int initPos, int length);
+	float CalculateAreaPercentage();
+	bool IsBboxCorrect();
 };

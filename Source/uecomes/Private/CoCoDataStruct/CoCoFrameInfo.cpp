@@ -23,7 +23,7 @@ FCoCoFrameInfo UCoCoFrameInfo::GetStructData(){
     frameInfo.images.Add(m_imageInfo.GetStructData());
     // frameInfo.annotations.SetNum(m_annotations.Num());
     for(auto& object: m_annotations){
-        if (object.Key != 0){
+        if (object.Key != 0 && object.Value.CalculateAreaPercentage() > 0.0005 && object.Value.IsBboxCorrect()){
             frameInfo.annotations.Add(object.Value.GetStructData());
         }
     }
