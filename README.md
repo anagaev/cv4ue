@@ -9,9 +9,18 @@
 
 Create the folder **Plugins** in your project and clone the repo in it.
 
+Add to your scene  **BP_MultiCapturing** from **Content** folder.
+
+You can find how to create a crowd simulation in the pqrt **MassEntity** of the tutorial below.
+
  ## Demo
 
- to do
+[Video example](https://youtube.com/watch?v=hYsrO-sGn-o&si=EnSIkaIECMiOmarE)
+
+<img src="Demo/preview_img.jpg" width=15% height=15%>
+<img src="Demo/preview_bbox.jpg" width=15% height=15%>
+<img src="Demo/preview_mask.jpg" width=15% height=15%>
+<img src="Demo/preview_depth.jpg" width=15% height=15%>
 
 ---
 
