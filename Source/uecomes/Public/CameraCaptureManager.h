@@ -6,6 +6,7 @@ class UMaterial;
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Containers/Queue.h"
+#include "Chaos/Matrix.h"
 #include "AsyncTasks/AsyncSaveImageToDiskTask.h"
 #include "CoCoDataStruct/CoCoAnnotationInfo.h"
 #include "CoCoDataStruct/CoCoFrameInfo.h"
@@ -67,7 +68,7 @@ public:
     UPROPERTY(EditAnywhere, Category="Logging")
     bool VerboseLogging = false;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category="Logging")
     TEnumAsByte<OutputFormat> outputFormat = IMG;
 
 protected:
@@ -85,9 +86,6 @@ protected:
     void RunAsyncImageSaveTask(TArray64<uint8>& Image, FString& ImageName);
     void RunAsyncJsonSaveTask(FCoCoFrameInfo data, FString& ImageName);
 
-    //void SpawnSegmentationCaptureComponent(ASceneCapture2D* ColorCapture);
-    //void SetupSegmentationCaptureComponent(ASceneCapture2D* ColorCapture);
-
     FString ToStringWithLeadingZeros(int32 Integer, int32 MaxDigits);
 
 public:	
@@ -96,4 +94,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ImageCapture")
     void CaptureNonBlocking();
+
+    FMatrix GetExtrinsicsMatrix();
+    Chaos::PMatrix<float, 3, 3> GetIntrinsicMatrix();
 };

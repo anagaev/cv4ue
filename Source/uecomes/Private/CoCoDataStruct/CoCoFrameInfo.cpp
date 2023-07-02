@@ -12,10 +12,6 @@ UCoCoFrameInfo::~UCoCoFrameInfo(){
 
 void UCoCoFrameInfo::AddAnnotation(int key, UCoCoAnnotationInfo& annotationInfo){
    m_annotations.Add(key, annotationInfo);
-   for (auto& element: m_annotations){
-        UE_LOG(LogTemp, Warning, TEXT("Key: %i"), element.Key);
-   }
-   UE_LOG(LogTemp, Warning, TEXT("Length of the annotations array (add): %i"), m_annotations.Num());
 }
 
 FCoCoFrameInfo UCoCoFrameInfo::GetStructData(){

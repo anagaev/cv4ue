@@ -20,6 +20,10 @@
 #include "Modules/ModuleManager.h"
 #include "Misc/FileHelper.h"
 #include "JsonObjectConverter.h"
+#include "Camera/CameraTypes.h"
+#include "Chaos/Matrix.h"
+#include "Chaos/Real.h"
+
 
 // Sets default values
 ACameraCaptureManager::ACameraCaptureManager()
@@ -79,7 +83,14 @@ void ACameraCaptureManager::Tick(float DeltaTime)
                 case JSON:
                     filePath += ".json";
                     TArray<FColor>& rawData = nextRenderRequest->Image;
-                    UCoCoImageInfo imageInfo(ImgCounter, FrameWidth, FrameHeight, fileName + ".jpeg");
+
+                    FTransform parentActorTransform = RootComponent->GetAttachParent()->GetOwner()->GetTransform();
+                    FRotator cameraRotator = parentActorTransform.Rotator();
+                    FVector cameraTranslation = parentActorTransform.GetTranslation();
+                    FMinimalViewInfo cameraInfo;
+                    CaptureComponent->GetCameraView(0.0, cameraInfo);
+
+                    UCoCoImageInfo imageInfo(ImgCounter, FrameWidth, FrameHeight, fileName + ".jpeg", cameraTranslation, cameraRotator, cameraInfo);
                     UCoCoFrameInfo frameInfo(imageInfo);
 
                     int currentColor = rawData[0].R;
@@ -229,4 +240,22 @@ void ACameraCaptureManager::RunAsyncJsonSaveTask(FCoCoFrameInfo data, FString& I
     UE_LOG(LogTemp, Warning, TEXT("Running Async Task"));
     TSharedPtr<FJsonObject> pJsonObject = FJsonObjectConverter::UStructToJsonObject(data);
     (new FAutoDeleteAsyncTask<AsyncSaveJsonToDiskTask>(pJsonObject, ImageName))->StartBackgroundTask();
+}
+
+FMatrix ACameraCaptureManager::GetExtrinsicsMatrix(){
+    FTransform parentActorTransform = RootComponent->GetAttachParent()->GetOwner()->GetTransform();
+    FRotator parentActorRotator = parentActorTransform.Rotator();
+    FVector parentActorTranslation = parentActorTransform.GetTranslation();
+    FVector translation = -parentActorRotator.UnrotateVector(parentActorTranslation);
+    FMatrix m = FRotationTranslationMatrix(parentActorRotator, parentActorTranslation).GetTransposed();
+    return m;
+}
+
+Chaos::PMatrix<float, 3, 3> ACameraCaptureManager::GetIntrinsicMatrix(){
+    FMinimalViewInfo cameraInfo;
+    CaptureComponent->GetCameraView(0.0, cameraInfo);
+    float f = 0.5 * FrameWidth / FMath::Tan(0.5 * cameraInfo.FOV);
+    FVector2D offset = cameraInfo.OffCenterProjectionOffset;
+    Chaos::PMatrix<float, 3, 3> intrinsicMatrix(f, 0.0, offset[0], 0.0, f, offset[1], 0.0, 0.0, 1.0);
+    return intrinsicMatrix;
 }

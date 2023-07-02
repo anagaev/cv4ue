@@ -7,20 +7,24 @@
 
  ## Instalation
 
-Create the folder **Plugins** in your project and clone the repo in it.
+Clone the repo.
 
-Add to your scene  **BP_MultiCapturing** from **Content** folder.
+Open `Engine\Build\Batchfiles` in Unreal Engine location.
 
-You can find how to create a crowd simulation in the pqrt **MassEntity** of the tutorial below.
+Run RunUAT script:
+ - **Windows**: `RunUAT.bat BuildPlugin -plugin="[uplugin file path]" -package="[temporary location]"`
+ - **Linux/OSX**: `RunUAT.sh BuildPlugin -plugin="[uplugin file path]" -package="[temporary location]"`
+
+Copy the plugin from temporary location to the Engine ou your project.
 
  ## Demo
 
 [Video example](https://youtube.com/watch?v=hYsrO-sGn-o&si=EnSIkaIECMiOmarE)
 
-<img src="Demo/preview_img.jpg" width=15% height=15%>
-<img src="Demo/preview_bbox.jpg" width=15% height=15%>
-<img src="Demo/preview_mask.jpg" width=15% height=15%>
-<img src="Demo/preview_depth.jpg" width=15% height=15%>
+<img src="Demo/preview_img.jpg" width=20% height=20%>
+<img src="Demo/preview_bbox.jpg" width=20% height=20%>
+<img src="Demo/preview_mask.jpg" width=20% height=20%>
+<img src="Demo/preview_depth.jpg" width=20% height=20%>
 
 ---
 
@@ -38,15 +42,14 @@ Create a new Blank project:
 
 <img src="README_source/ue_00001.png" width=50% height=50%>
 
-Add a new empty level:
+Add a new basic level:
 
 <img src="README_source/ue_00002.png" width=50% height=50%>
-Add DirectionalLight, ExponentilHeightFog, SkyAtmosphere and SkyLight:
 
 ### **MassEntity**
 Now we can start by touching MassEntity. MassEntity is a plugin in Unreal Engine 5 for data-oriented calculation. The overview could be found [here](https://docs.unrealengine.com/5.0/en-US/overview-of-mass-entity-in-unreal-engine/) or [here](https://www.youtube.com/watch?v=f9q8A-9DvPo). The first application was the demo The Matrix Awakens. The plugin is quite new and still in development. And unfortunately, the documentation is missing and the existing tutorials which could be found are a bit outdated.
 I used [this tutotrial](https://www.youtube.com/watch?v=2LvUB3_PAhI). There were no problems except a few easy to solve. So you can follow it with some small changes to solve possible problems that I’ll describe below
-When you open BP_CrowdCharacter, you should see four warning starting by “Get SkeletalMesh: ” :
+When you open `BP_CrowdCharacter`, you should see four warning starting by `Get SkeletalMesh: ` :
 
 <img src="README_source/ue_00008.png" width=50% height=50%>
 
@@ -64,7 +67,7 @@ While starting the simulation you can see this error:
 <img src="README_source/ue_00018.png" width=30% height=30%>
 
 I didn’t figure out who to fix it. I only found [this discussion on the official UE forum](https://forums.unrealengine.com/t/solved-ue5-mass-ai-some-traits-are-requiring-the-presence-of-fragments-which-are-missing/691512). Anyways, the simulation works.
-At 8:02, don’t close DA_CrowdAgent, but expand the StateTree fragment and create a StateTree by this way. I don’t know (likely a bug) why but the way presented in the video doesn’t work : it is impossible to select the StateTree in the fragment setting.
+At 8:02, don’t close `DA_CrowdAgent`, but expand the StateTree fragment and create a StateTree by this way. I don’t know (likely a bug) why but the way presented in the video doesn’t work : it is impossible to select the StateTree in the fragment setting.
 
 <img src="README_source/ue_00016.png" width=50% height=50%>
 
@@ -91,13 +94,13 @@ It is possible to visualize the scene with the stencil value. Click Lit->Buffer 
 
 <img src="README_source/ue_00022.png" width=25% height=25%>
 
-Let us return to BP_CrowdCharacter. Actors created by MassEntity system don’t exist at the begging of the simulation/game. So, iterating through all objects in the scene and changing their stencil value at the beginning is not a good idea. This is the reason why [UnrealGT](https://github.com/unrealgt/unrealgt) doesn’t work with the MassEntity system. It seems there are two ways to handle it:
+Let us return to `BP_CrowdCharacter`. Actors created by MassEntity system don’t exist at the begging of the simulation/game. So, iterating through all objects in the scene and changing their stencil value at the beginning is not a good idea. This is the reason why [UnrealGT](https://github.com/unrealgt/unrealgt) doesn’t work with the MassEntity system. It seems there are two ways to handle it:
 1. Use MassSpawner from MassEntity system in order to set the stencil value (honestly I tried this approach several times, didn't succeed)
-2. Set the stencil value in ”the constructor” of BP_CrowdCharacter
+2. Set the stencil value in ”the constructor” of `BP_CrowdCharacter`
 
 As you might have guessed, I’am going to show the second approach. 
 Open BP_CrowdCharacter. Add a new function, call it SetStencilValue and drop into SetupComponents. Open this function and create a Blueprint graph as shown below. ue_00024.
-The logic is pretty simple. We get an array of all objects of class BP_CrowdCharacter having been created until the present. The length of this array plus one is used as the stencil value of Mesh or Groom Components of the new object of class BP_CrowdCharacter. In our case, Skeletal Mesh Components are Bottom, Shoes, Top, Accessory, Body, Face, Hair, Beard, Mustache.
+The logic is pretty simple. We get an array of all objects of class `BP_CrowdCharacter` having been created until the present. The length of this array plus one is used as the stencil value of Mesh or Groom Components of the new object of class `BP_CrowdCharacter`. In our case, Skeletal Mesh Components are Bottom, Shoes, Top, Accessory, Body, Face, Hair, Beard, Mustache.
 
 Return to the ConstructionScript. 
 
