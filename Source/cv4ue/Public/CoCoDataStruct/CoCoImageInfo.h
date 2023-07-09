@@ -33,7 +33,7 @@ struct FCoCoImageInfo
 	FQuat camera_rotation;
 };
 
-class UECOMES_API UCoCoImageInfo
+class CV4UE_API UCoCoImageInfo
 {
 public:
 	FCoCoImageInfo data;

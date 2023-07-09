@@ -34,7 +34,7 @@ struct FRenderRequestStruct{
 
 
 UCLASS(Blueprintable)
-class UECOMES_API ACameraCaptureManager : public AActor
+class CV4UE_API ACameraCaptureManager : public AActor
 {
 	GENERATED_BODY()
 	

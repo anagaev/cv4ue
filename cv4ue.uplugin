@@ -2,8 +2,8 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"FriendlyName": "uecomes",
-	"Description": "COCO-like annotations for Mass Entity System",
+	"FriendlyName": "cv4ue",
+	"Description": "Computer Vision for Unreal Engine with COCO-like annotation structure.",
 	"Category": "Other",
 	"CreatedBy": "anagaev",
 	"CreatedByURL": "",
@@ -16,7 +16,7 @@
 	"Installed": false,
 	"Modules": [
 		{
-			"Name": "uecomes",
+			"Name": "cv4ue",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

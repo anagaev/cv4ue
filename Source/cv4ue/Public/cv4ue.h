@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FuecomesModule : public IModuleInterface
+class Fcv4ueModule : public IModuleInterface
 {
 public:
 

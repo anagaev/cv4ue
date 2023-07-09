@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class uecomes : ModuleRules
+public class cv4ue : ModuleRules
 {
-	public uecomes(ReadOnlyTargetRules Target) : base(Target)
+	public cv4ue(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		

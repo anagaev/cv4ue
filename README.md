@@ -1,4 +1,4 @@
-# UECOMES
+# CV4UE - Computer Vision for Unreal Engine
 
  ## Discription
 
@@ -31,7 +31,7 @@
 * Enable the plugin in `Edit > Plugins`.
 * Select  `Enabled with Stencil` in `Edit > Project Settings > Postprocessing > Custom Depth-Stencil Pass`.
 * Enable `Render CustomDepth Pass` and set `CustomDepth Stencil Value` (from 0 to 255) for objects in scene you would like to registrate. Different object should have differents `CustomDepth Stencil Value`s.
-* Put `BP_MultiCapturing` from `Plugins/uecomes Content/Blueprints`. This Bluprint class contais three instances of `BP_Capturing` that capture Scene, Depth and Masks.
+* Put `BP_MultiCapturing` from `Plugins/cv4ue Content/Blueprints`. This Bluprint class contais three instances of `BP_Capturing` that capture Scene, Depth and Masks.
 * Now you can play directly the level in editor viewport.
 * The results are located in `ProjectFolder/Saved/{img, depth, mask}`.
 

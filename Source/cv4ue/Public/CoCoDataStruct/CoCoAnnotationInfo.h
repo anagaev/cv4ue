@@ -31,7 +31,7 @@ struct FCoCoAnnotationInfo{
 
 
 
-class UECOMES_API UCoCoAnnotationInfo
+class CV4UE_API UCoCoAnnotationInfo
 {
 private:
 	int width;

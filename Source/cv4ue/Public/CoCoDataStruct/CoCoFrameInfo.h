@@ -21,7 +21,7 @@ struct FCoCoFrameInfo{
 
 
 
-class UECOMES_API UCoCoFrameInfo
+class CV4UE_API UCoCoFrameInfo
 {
 private:
     TMap<int, UCoCoAnnotationInfo> m_annotations;
