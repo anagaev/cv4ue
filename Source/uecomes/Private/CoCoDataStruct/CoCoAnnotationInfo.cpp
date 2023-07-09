@@ -8,7 +8,7 @@
 UCoCoAnnotationInfo::UCoCoAnnotationInfo(int id, int imageId, int imgWidth, int imgHeight)
 {   
     data.category_id = 1;
-    data.iscrowd = 0;
+    data.iscrowd = 1;
     data.bbox.SetNum(4);
     data.bbox[0] = INT_MAX;
     data.bbox[1] = INT_MAX;
