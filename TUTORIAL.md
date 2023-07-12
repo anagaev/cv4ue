@@ -45,7 +45,7 @@ Now we have a pedestrian simulation. Time to capture and create annotations.
 
 ## **Masking** 
 Unreal Engine 5 has several methods to create masks. You can find videos about them, for example [here](https://www.youtube.com/watch?v=PiQ_JLJKi0M) and [here](https://www.youtube.com/watch?v=JH07z9Ap1hk). I recommend you to watch the first video. Next we’ll see how to create instance segmentation masks via a stencil buffer.
-The stencil buffer is one of multiple buffers used for rendering. The objective of this buffer is to limit the area of rendering. The possible way of its application you can find below: https://www.youtube.com/watch?v=EzM8LGzMjmc
+The stencil buffer is one of multiple buffers used for rendering. The objective of this buffer is to limit the area of rendering. The possible way of its application can be found below: https://www.youtube.com/watch?v=EzM8LGzMjmc
 The first thing we need is to enable Custom Depth-Stencil Pass.
 Edit->Project Setings…. 
 
@@ -65,7 +65,7 @@ It is possible to visualize the scene with the stencil value. Click Lit->Buffer 
 <img src="README_source/ue_00022.png" width=25% height=25%>
 
 Let's return to `BP_CrowdCharacter`. Actors created by MassEntity system don’t exist at the begging of the simulation/game. So, iterating through all objects in the scene and changing their stencil value at the beginning is not a good idea. This is the reason why [UnrealGT](https://github.com/unrealgt/unrealgt) doesn’t work with the MassEntity system. It seems there are two ways to handle it:
-1. Use MassSpawner from MassEntity system in order to set the stencil value (honestly I tried this approach several times, didn't succeed)
+1. Use MassSpawner from the MassEntity system in order to set the stencil value (honestly I tried this approach several times, didn't succeed)
 2. Set the stencil value in ”the constructor” of `BP_CrowdCharacter`
 As you might have guessed, I’am going to show the second approach. 
 Open BP_CrowdCharacter. Add a new function, call it SetStencilValue and drop into SetupComponents. Open this function and create a Blueprint graph as shown below. ue_00024.
@@ -96,7 +96,7 @@ Change “Scene Texture Id” from “SceneColor” to “CustomStencil”:
 
 <img src="README_source/ue_pm_004.png" width=50% height=50%>
 
-Right click and add Divide node. Connect all nodes:
+Right click and add the Divide node. Connect all nodes:
 
 <img src="README_source/ue_pm_005.png" width=50% height=50%>
 
@@ -107,13 +107,13 @@ You can find the example of a post processing material for the depth capture:
 
 ## **Writing on disk**
 There is a very good tutorial about Image capturing for Unreal Engine 4, 5 - [link](https://github.com/TimmHess/UnrealImageCapture).
-Few words about it. The main idea is to capture the screen without blocking RenderThread and GameThread. Otherwise, FPS is dropped down (until 3-5). A render request is placed on the UE rendering pipeline. Once the render request is completed and all data (i.e. screen capture, masks, depth) is ready, we save the data to disk via an asynchronous procedure in order not to block GameThread.
+A few words about it. The main idea is to capture the screen without blocking RenderThread and GameThread. Otherwise, FPS is dropped down (until 3-5). A render request is placed on the UE rendering pipeline. Once the render request is completed and all data (i.e. screen capture, masks, depth) is ready, we save the data to disk via an asynchronous procedure in order not to block GameThread.
 I recommend you to read the [full tutorial](https://github.com/TimmHess/UnrealImageCapture) mentioned above.
 
 I've added several changes to the ‘CameraCaptureManager’ class, but the general structure stays the same.
 1. CaptureComponent (USceneCaptureComponent2D) is created and attached to the RootComponent in the constructor.
 2. CaptureComponent->GetCaptureComponent2D()->... is replaced just by CaptureComponent->...
-3. I remove .png format and float scene capturing for CaptureManager
+3. I removed the .png format and float scene capturing for CaptureManager
 4. The original code is a bit outdated (if the comments in the source code of UE 5.1 are still reliable). All preparations for writing to disk could be done just by one line: ImageWrapperModule.CompressImage(ImgData, EImageFormat::PNG, FImageView(nextRenderRequest->Image.GetData(), FrameWidth, FrameHeight));
 5. Implemented a code in order to transform mask into rle-encoding
 6. Added structs for CoCo-like annotations (in the folder CoCoDataStruct)
